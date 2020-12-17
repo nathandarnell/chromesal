@@ -11,7 +11,7 @@ var report = {};
 report.MachineInfo = {};
 report.MachineInfo.HardwareInfo = {};
 var callbackCount = 0;
-var callbackTotal = 12;
+var callbackTotal = 13;
 var doNotSend = false;
 var appInventory = [];
 var settingsSet = false;
@@ -99,7 +99,7 @@ function getOsVersion() {
 
 function sendBackStorageInfo(info) {
   callbackCount++;
-  // console.log(info);
+//   console.log(info);
   if (info.length === 0) {
     data.disk_size = '1';
   } else {
@@ -269,8 +269,8 @@ function sal4ReportFormat(report){
       'cpu_speed': report.MachineInfo.HardwareInfo.current_processor_speed,
       'memory': report.MachineInfo.HardwareInfo.physical_memory,
       'memory_kb': report.MachineInfo.HardwareInfo.physical_memory_kb,
-      'machine_model': "Chrome OS Device",
-      'machine_model_friendly': "Chrome OS Device"
+      'machine_model': report.MachineInfo.HardwareInfo.machine_model,
+      'machine_model_friendly': report.MachineInfo.HardwareInfo.machine_model
       
   };
 
@@ -457,6 +457,47 @@ async function getDeviceSerial() {
       }
       if (debug === false) {
         console.log('setting do not send to true due to no serial error and not being debug')
+        doNotSend = true;
+      }
+    }
+    callbackCount++;
+}
+
+async function getHardwarePlatform() {
+  // We are only going to run on a Chrome OS device
+  chrome.runtime.getPlatformInfo(async function(info) {
+    //console.log(info)
+    if (!info.os.toLowerCase().includes('cros')){
+      if (debug === false) {
+        console.log('Not cros and not debug')
+        doNotSend = true;
+      }
+    }
+  });
+  try {
+      chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async hardwarePlatformInfo => {
+//           renderStatus(hardwarePlatformInfo);
+          console.log(hardwarePlatformInfo);
+          var make = hardwarePlatformInfo.manufacturer;
+          var model = hardwarePlatformInfo.model;
+          report.MachineInfo.HardwareInfo.machine_model = make + ' ' + model;
+          if (report.MachineInfo.HardwareInfo.machine_model === '') {
+            throw 'No Hardware info returned'
+            if (debug === false) {
+              console.log('setting do not send to true due to no Hardware info being returned and not being debug')
+              doNotSend = true;
+            }
+          }
+      });
+    }
+    catch(err) {
+      report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
+      console.log('Not a managed chrome device');
+      if (debug === true){
+        console.log(err);
+      }
+      if (debug === false) {
+        console.log('setting do not send to true due to no Hardware info error and not being debug')
         doNotSend = true;
       }
     }
