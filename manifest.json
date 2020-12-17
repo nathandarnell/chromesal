@@ -27,6 +27,7 @@
     "management",
     "storage",
     "enterprise.deviceAttributes",
+    "enterprise.hardwarePlatform",
     "alarms",
     "identity",
     "identity.email"
