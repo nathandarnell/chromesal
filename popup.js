@@ -586,15 +586,15 @@ function getSettings(){
     });
   });
   chrome.storage.managed.get(null, function(adminConfig) {
-
-    console.log("chrome.storage.managed.get adminConfig: ", adminConfig);
+    if (debug === true){
+      console.log("chrome.storage.managed.get adminConfig: ", adminConfig);
+    }
     data.key = adminConfig['key'];
     key = adminConfig['key'];
     serverURL = adminConfig['serverurl'];
     if ("legacycheckin" in adminConfig) {
       legacyCheckin = adminConfig['legacycheckin'];
     }
-
 
     settingsSet = true;
     callbackCount++;
