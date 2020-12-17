@@ -4,15 +4,15 @@
 
 
 // Set up some globals
-var debug = false;
+var debug = true;
 var data = {};
 data.sal_version = '';
 var report = {};
 report.MachineInfo = {};
 report.MachineInfo.HardwareInfo = {};
 var callbackCount = 0;
-var callbackTotal = 11;
-var doNotSend = false;
+var callbackTotal = 13;
+var doNotSend = true;
 var appInventory = [];
 var settingsSet = false;
 
