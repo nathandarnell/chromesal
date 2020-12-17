@@ -99,7 +99,7 @@ function getOsVersion() {
 
 function sendBackStorageInfo(info) {
   callbackCount++;
-//   console.log(info);
+  console.log(info);
   if (info.length === 0) {
     data.disk_size = '1';
   } else {
@@ -618,6 +618,7 @@ function main() {
   waitForSettings(function() {
   guid();
   getExtensionVersion();
+  getHardwarePlatform();
   getDeviceSerial();
   getGoogleDeviceIdentifier();
   getDeviceName();
