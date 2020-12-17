@@ -475,7 +475,7 @@ async function getHardwarePlatform() {
     }
   });
   try {
-      chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async hardwarePlatformInfo => {
+      chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(hardwarePlatformInfo) {
 //           renderStatus(hardwarePlatformInfo);
           console.log(hardwarePlatformInfo);
           var make = hardwarePlatformInfo.manufacturer;
