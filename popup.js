@@ -97,10 +97,36 @@ function getOsVersion() {
   callbackCount++;
 }
 
+// Used similar style as: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/factory/diagnosis-extension/extension/src/tests/info/info.js
+// function getStorageInfo() {
+//     const createStorageInfo = (index, elem) => {
+//       const div = document.createElement('div');
+//       div.id =  'hard-disk ' + index.toString();
+//       div.appendChild(this.createListItem('Name: ' + elem.name));
+//       div.appendChild(
+//           this.createListItem('Capacity: ' +
+//               this.convertBytes(elem.capacity).toString()));
+//       return div;
+//     };
+// 
+//     chrome.system.storage.getInfo((info) => {
+//       if(!info) this.endTest(false, 'Cannot get Memory info');
+//       const divStorage = document.createElement('h3');
+//       divStorage.id = 'hard-disk';
+//       for (const [index, elem] of info.entries()) {
+//         if (elem.type === 'fixed') {
+//           divStorage.appendChild(createStorageInfo(index, elem));
+//         }
+//       }
+//       document.getElementById('info').appendChild(divStorage);
+//     });
+//   }
+
+
 function sendBackStorageInfo(info) {
   callbackCount++;
   console.log(info);
-  if (info.length === 0) {
+  if (!info) {
     console.log("info.length for storage is 0");
     data.disk_size = '1';
   } else {
