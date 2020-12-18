@@ -503,15 +503,15 @@ async function getHardwarePlatform() {
   });
   try {
       chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(info) {
-          if (!info) throw 'No Hardware info returned';
-          if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned';
-          renderStatus(info);
+          if (!info) throw 'No Hardware info returned (empty)';
+          if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
+//           renderStatus(info);
           if (debug === true) console.log(info);
           var make = info.manufacturer;
           var model = info.model;
           report.MachineInfo.HardwareInfo.machine_model = make + ' ' + model;
           if (report.MachineInfo.HardwareInfo.machine_model === '') {
-            throw 'No Hardware info returned'
+            throw 'No Hardware info returned (report empty)'
             if (debug === false) {
               console.log('setting do not send to true due to no Hardware info being returned and not being debug')
               doNotSend = true;
