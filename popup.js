@@ -128,10 +128,9 @@ function sendBackStorageInfo(info) {
   console.log(info);
   if (!Array.isArray(info) || !info.length) {
     console.log("info.length for storage is 0");
-    data.disk_size = '1';
+    report.AvailableDiskSpace = '1';
   } else {
     console.log("info.length for storage is not 0 so it should report a size");
-    data.disk_size = info[0].capacity;
     report.AvailableDiskSpace = info[0].capacity;
   }
 }
