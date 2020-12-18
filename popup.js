@@ -126,7 +126,7 @@ function getOsVersion() {
 function sendBackStorageInfo(info) {
   callbackCount++;
   console.log(info);
-  if (!info) {
+  if (!Array.isArray(info) || !info.length) {
     console.log("info.length for storage is 0");
     data.disk_size = '1';
   } else {
@@ -504,8 +504,10 @@ async function getHardwarePlatform() {
   });
   try {
       chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(info) {
-//           renderStatus(hardwarePlatformInfo);
-          console.log(info);
+          if (!info) throw 'No Hardware info returned';
+          if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned';
+          renderStatus(info);
+          if (debug === true) console.log(info);
           var make = info.manufacturer;
           var model = info.model;
           report.MachineInfo.HardwareInfo.machine_model = make + ' ' + model;
@@ -520,7 +522,6 @@ async function getHardwarePlatform() {
     }
     catch(err) {
       report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
-      console.log('Not a managed chrome device');
       if (debug === true){
         console.log(err);
       }
