@@ -101,8 +101,10 @@ function sendBackStorageInfo(info) {
   callbackCount++;
   console.log(info);
   if (info.length === 0) {
+    console.log("info.length for storage is 0");
     data.disk_size = '1';
   } else {
+    console.log("info.length for storage is not 0 so it should report a size");
     data.disk_size = info[0].capacity;
     report.AvailableDiskSpace = info[0].capacity;
   }
@@ -117,7 +119,7 @@ function getMemInfo() {
 }
 
 function sendBackMem(info) {
-  // console.log(info);  
+  console.log(info);  
   report.MachineInfo.HardwareInfo.physical_memory = (info.capacity/1073741824).toFixed(2) + ' GB';
   report.MachineInfo.HardwareInfo.physical_memory_kb = (info.capacity/1024);
   callbackCount++;
@@ -475,11 +477,11 @@ async function getHardwarePlatform() {
     }
   });
   try {
-      chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(hardwarePlatformInfo) {
+      chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(info) {
 //           renderStatus(hardwarePlatformInfo);
-          console.log(hardwarePlatformInfo);
-          var make = hardwarePlatformInfo.manufacturer;
-          var model = hardwarePlatformInfo.model;
+          console.log(info);
+          var make = info.manufacturer;
+          var model = info.model;
           report.MachineInfo.HardwareInfo.machine_model = make + ' ' + model;
           if (report.MachineInfo.HardwareInfo.machine_model === '') {
             throw 'No Hardware info returned'
@@ -552,7 +554,6 @@ function getExtensions() {
         inventory_item.description = extension.description;
         appInventory.push(inventory_item)
       });
-
     }
 
     callbackCount++;
