@@ -35,7 +35,7 @@ async function getDeviceName() {
     chrome.enterprise.deviceAttributes.getDeviceHostname(async hostname => {
       data.name = hostname;
       if (data.name === '') {
-        throw 'No Hostname returned'
+        throw 'No Hostname returned';
       }
     });
   }
@@ -49,7 +49,7 @@ async function getDeviceName() {
         chrome.enterprise.deviceAttributes.getDeviceAssetId(async assetId => {
           data.name = assetId;
           if (data.name === '') {
-            throw 'No AssetId returned'
+            throw 'No AssetId returned';
           }
         });
       }
@@ -68,7 +68,7 @@ function getConsoleUser(){
   chrome.identity.getProfileUserInfo(function(info){
     data.username = info.email;
     // console.log(info);
-  })
+  });
   callbackCount++;
 }
 
@@ -127,7 +127,7 @@ function sendBackStorageInfo(info) {
   callbackCount++;
   console.log(info);
   if (!Array.isArray(info) || !info.length) {
-    console.log("info.length for storage is 0");
+    console.log("info is not array or info.length for storage is 0");
     report.AvailableDiskSpace = '1';
   } else {
     console.log("info.length for storage is not 0 so it should report a size");
@@ -496,27 +496,33 @@ async function getHardwarePlatform() {
     //console.log(info)
     if (!info.os.toLowerCase().includes('cros')){
       if (debug === false) {
-        console.log('Not cros and not debug')
+        console.log('Not cros and not debug');
         doNotSend = true;
       }
     }
   });
   try {
       chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(info) {
-          if (!info) throw 'No Hardware info returned (empty)';
-          if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
+          if (!info || info === 'undefined') throw 'No Hardware info returned (empty)';
+          // if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
 //           renderStatus(info);
           if (debug === true) console.log(info);
           var make = info.manufacturer;
           var model = info.model;
           report.MachineInfo.HardwareInfo.machine_model = make + ' ' + model;
           if (report.MachineInfo.HardwareInfo.machine_model === '') {
-            throw 'No Hardware info returned (report empty)'
+            throw 'No Hardware info returned (report empty)';
             if (debug === false) {
-              console.log('setting do not send to true due to no Hardware info being returned and not being debug')
+              console.log('setting do not send to true due to no Hardware info being returned and not being debug');
               doNotSend = true;
             }
           }
+      }, _=>{
+        let e = chrome.runtime.lastError;
+        if(e !== undefined){
+          console.log(info, _, e);
+          report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
+        }
       });
     }
     catch(err) {
@@ -525,7 +531,7 @@ async function getHardwarePlatform() {
         console.log(err);
       }
       if (debug === false) {
-        console.log('setting do not send to true due to no Hardware info error and not being debug')
+        console.log('setting do not send to true due to no Hardware info error and not being debug');
         doNotSend = true;
       }
     }
