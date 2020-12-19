@@ -11,7 +11,7 @@ var report = {};
 report.MachineInfo = {};
 report.MachineInfo.HardwareInfo = {};
 var callbackCount = 0;
-var callbackTotal = 13;
+var callbackTotal = 14;
 var doNotSend = true;
 var appInventory = [];
 var settingsSet = false;
@@ -309,7 +309,9 @@ function sal4ReportFormat(report){
   out.Sal.facts = {'checkin_module_version': data.sal_version}
   out.Machine.facts = {
     'checkin_module_version': data.sal_version,
-    'google_gevice_id': data.google_device_identifier
+    'google_gevice_id': data.google_device_identifier,
+    'ipv4_address': data.ipv4,
+    'ipv6_address': data.ipv6
   };
   out.Sal.extra_data = {'key': data.key, 'sal_version': data.sal_version}
   // out.key = data.key
@@ -517,6 +519,8 @@ async function getHardwarePlatform() {
               doNotSend = true;
             }
           }
+// Tries to catch the runtime error since ChromeOS doesn't have permissions for this API call yet
+// https://stackoverflow.com/questions/26517988/unchecked-runtime-lasterror-while-running-tabs-executescript/45603880#45603880
       }, _=>{
         let e = chrome.runtime.lastError;
         if(e !== undefined){
@@ -532,6 +536,56 @@ async function getHardwarePlatform() {
       }
       if (debug === false) {
         console.log('setting do not send to true due to no Hardware info error and not being debug');
+        doNotSend = true;
+      }
+    }
+    callbackCount++;
+}
+
+async function getNetworkInfo() {
+  // We are only going to run on a Chrome OS device
+  chrome.runtime.getPlatformInfo(async function(info) {
+    //console.log(info)
+    if (!info.os.toLowerCase().includes('cros')){
+      if (debug === false) {
+        console.log('Not cros and not debug');
+        doNotSend = true;
+      }
+    }
+  });
+  try {
+    chrome.enterprise.networkingAttributes.getNetworkDetails(async function(info) {
+          if (!info || info === 'undefined') throw 'No networking info returned (empty)';
+          // if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
+//           renderStatus(info);
+          if (debug === true) console.log(info);
+          data.ipv4 = info.ipv4;
+          data.ipv6 = info.ipv6;
+          
+          if (data.ipv4 === '') {
+            throw 'No network info returned (report empty)';
+            if (debug === false) {
+              console.log('setting do not send to true due to no network info being returned and not being debug');
+              doNotSend = true;
+            }
+          }
+// Tries to catch the runtime error since this is where the API puts errors for not network connected
+// https://stackoverflow.com/questions/26517988/unchecked-runtime-lasterror-while-running-tabs-executescript/45603880#45603880
+      }, _=>{
+        let e = chrome.runtime.lastError;
+        if(e !== undefined){
+          console.log(info, _, e);
+          // report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
+        }
+      });
+    }
+    catch(err) {
+      // report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
+      if (debug === true){
+        console.log(err);
+      }
+      if (debug === false) {
+        console.log('setting do not send to true due to no network info error and not being debug');
         doNotSend = true;
       }
     }
@@ -652,6 +706,7 @@ function main() {
   guid();
   getExtensionVersion();
   getHardwarePlatform();
+  getNetworkInfo();
   getDeviceSerial();
   getGoogleDeviceIdentifier();
   getDeviceName();
