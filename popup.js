@@ -222,6 +222,7 @@ function addManagedInstalls(report, appInventory){
   if (report.hasOwnProperty('ManagedInstalls')) {
     return report;
   }
+  // TODO: Remove legacy checkin code here
   if (legacyCheckin == true) {
     var root = [];
     appInventory.forEach( function(extension){
@@ -239,14 +240,17 @@ function addManagedInstalls(report, appInventory){
   } else {
     report.ManagedInstalls = {}
     appInventory.forEach ( function(extension){
-      if (extension.install_type == 'admin') {
+      // if (extension.install_type == 'admin') {
         report.ManagedInstalls[extension.name] = {
           'status': 'PRESENT',
           'data': {
             'type': "Extension"
+            'installed_version': extension.version,
+            'description': extension.description,
+            'display_name': extension.bundleid
           }
         }
-      }
+      // }
     });
 
     if (debug === true) console.log(report.ManagedInstalls);
@@ -633,7 +637,7 @@ function getExtensions() {
         var inventory_item = {};
         inventory_item.name = extension.name;
         inventory_item.bundleid = extension.id;
-        inventory_item.version= extension.version;
+        inventory_item.version = extension.version;
         inventory_item.install_type = extension.installType;
         inventory_item.description = extension.description;
         appInventory.push(inventory_item)
