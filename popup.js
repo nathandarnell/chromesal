@@ -18,6 +18,7 @@ var settingsSet = false;
 
 var key = '';
 var serverURL = '';
+// TODO: Remove legacy checkin code here
 var legacyCheckin = false;
 
 function renderStatus(statusText) {
@@ -127,10 +128,11 @@ function sendBackStorageInfo(info) {
   callbackCount++;
   console.log(info);
   if (!Array.isArray(info) || !info.length) {
-    console.log("info is not array or info.length for storage is 0");
+    if (debug === true) console.log("info is not array or info.length for storage is 0");
     report.AvailableDiskSpace = '1';
   } else {
-    console.log("info.length for storage is not 0 so it should report a size");
+    if (debug === true) console.log("info.length for storage is not 0 so it should report a size");
+    if (debug === true) console.log(info);
     report.AvailableDiskSpace = info[0].capacity;
   }
 }
@@ -144,7 +146,7 @@ function getMemInfo() {
 }
 
 function sendBackMem(info) {
-  console.log(info);  
+  if (debug === true) console.log(info);  
   report.MachineInfo.HardwareInfo.physical_memory = (info.capacity/1073741824).toFixed(2) + ' GB';
   report.MachineInfo.HardwareInfo.physical_memory_kb = (info.capacity/1024);
   callbackCount++;
@@ -247,8 +249,7 @@ function addManagedInstalls(report, appInventory){
       }
     });
 
-
-    // console.log(report.ManagedInstalls);
+    if (debug === true) console.log(report.ManagedInstalls);
 
   }
 
@@ -302,7 +303,7 @@ function sal4ReportFormat(report){
   };
 
   out.Machine.extra_data = new_report;
-  // console.log(report.ManagedInstalls);
+  if (debug === true) console.log(report.ManagedInstalls);
   out.Chrome.managed_items = report.ManagedInstalls;
   out.Sal = {}
   out.Chrome.facts = {'checkin_module_version': data.sal_version}
@@ -322,6 +323,7 @@ function sendData(){
   report.os_family = 'ChromeOS';
   report = addManagedInstalls(report, appInventory);
 
+  // TODO: Remove legacy checkin code here
   if (legacyCheckin === true){
     var reportPlist = PlistParser.toPlist(report);
     data.base64report = btoa(reportPlist);
@@ -335,10 +337,9 @@ function sendData(){
     }
   }
 
+  // TODO: Remove legacy checkin code here
   var inventoryPlist = buildInventoryPlist(appInventory);
   // console.log(reportPlist);
-
-
   // console.log(inventoryPlist)
   // console.log(buildInventoryPlist(appInventory));
   // console.log(data)
@@ -427,18 +428,18 @@ async function getGoogleDeviceIdentifier() {
   });
   try {
       chrome.enterprise.deviceAttributes.getDirectoryDeviceId(async google_deviceId => {
-          // renderStatus(deviceId);
-          // console.log(deviceId);
-          data.google_device_identifier = google_deviceId.toUpperCase();
-          if (data.google_device_identifier === '') {
-            throw 'No Google Identifier returned'
-            if (debug === false) {
-              console.log('setting do not send to true due to no serial being returned and not being debug')
+        if (debug === true) renderStatus(deviceId);
+        if (debug === true) console.log(deviceId);
+        data.google_device_identifier = google_deviceId.toUpperCase();
+        if (data.google_device_identifier === '') {
+          throw 'No Google Identifier returned'
+          if (debug === false) {
+            console.log('setting do not send to true due to no serial being returned and not being debug')
               doNotSend = true;
-            }
           }
+        }
       });
-    }
+  }
     catch(err) {
       data.google_device_identifier = 'abc123'.toUpperCase();
       console.log('Not a managed chrome device');
@@ -456,7 +457,7 @@ async function getGoogleDeviceIdentifier() {
 async function getDeviceSerial() {
   // We are only going to run on a Chrome OS device
   chrome.runtime.getPlatformInfo(async function(info) {
-    //console.log(info)
+    if (debug === true) console.log(info)
     if (!info.os.toLowerCase().includes('cros')){
       if (debug === false) {
         console.log('Not cros and not debug')
@@ -466,8 +467,8 @@ async function getDeviceSerial() {
   });
   try {
       chrome.enterprise.deviceAttributes.getDeviceSerialNumber(async serialNumber => {
-          // renderStatus(serialNumber);
-          // console.log(serialNumber);
+        if (debug === true) renderStatus(serialNumber);
+        if (debug === true) console.log(serialNumber);
           data.serial = serialNumber.toUpperCase();
           if (data.serial === '') {
             throw 'No Serial returned'
@@ -495,7 +496,7 @@ async function getDeviceSerial() {
 async function getHardwarePlatform() {
   // We are only going to run on a Chrome OS device
   chrome.runtime.getPlatformInfo(async function(info) {
-    //console.log(info)
+    if (debug === true) console.log(info)
     if (!info.os.toLowerCase().includes('cros')){
       if (debug === false) {
         console.log('Not cros and not debug');
@@ -507,7 +508,7 @@ async function getHardwarePlatform() {
       chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(info) {
           if (!info || info === 'undefined') throw 'No Hardware info returned (empty)';
           // if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
-//           renderStatus(info);
+          if (debug === true) renderStatus(info);
           if (debug === true) console.log(info);
           var make = info.manufacturer;
           var model = info.model;
@@ -524,6 +525,7 @@ async function getHardwarePlatform() {
       }, _=>{
         let e = chrome.runtime.lastError;
         if(e !== undefined){
+          if (debug === true) console.error ("Caught error doing: chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo");
           console.log(info, _, e);
           report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
         }
@@ -531,9 +533,7 @@ async function getHardwarePlatform() {
     }
     catch(err) {
       report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
-      if (debug === true){
-        console.log(err);
-      }
+      if (debug === true) console.log(err);
       if (debug === false) {
         console.log('setting do not send to true due to no Hardware info error and not being debug');
         doNotSend = true;
@@ -545,7 +545,7 @@ async function getHardwarePlatform() {
 async function getNetworkInfo() {
   // We are only going to run on a Chrome OS device
   chrome.runtime.getPlatformInfo(async function(info) {
-    //console.log(info)
+    if (debug === true) console.log(info);
     if (!info.os.toLowerCase().includes('cros')){
       if (debug === false) {
         console.log('Not cros and not debug');
@@ -561,7 +561,6 @@ async function getNetworkInfo() {
           if (debug === true) console.log(info);
           data.ipv4 = info.ipv4;
           data.ipv6 = info.ipv6;
-          
           if (data.ipv4 === '') {
             throw 'No network info returned (report empty)';
             if (debug === false) {
@@ -574,13 +573,12 @@ async function getNetworkInfo() {
       }, _=>{
         let e = chrome.runtime.lastError;
         if(e !== undefined){
+          if (debug === true) console.error ("Caught error doing: chrome.enterprise.networkingAttributes.getNetworkDetails");
           console.log(info, _, e);
-          // report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
         }
       });
     }
     catch(err) {
-      // report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
       if (debug === true){
         console.log(err);
       }
@@ -600,7 +598,7 @@ function getExtensionVersion() {
             var reader = new FileReader()
             reader.addEventListener("load", function (event) {
                 // data now in reader.result
-                // console.log(reader.result);
+                if (debug === true) console.log(reader.result);
                 var manifest = JSON.parse(reader.result);
                 data.sal_version =  manifest.version;
                 if (doNotSend == false){
@@ -631,7 +629,7 @@ function getExtensions() {
     if (appInventory != []) {
 
       info.forEach( function(extension){
-        // console.logxr(extension)
+        if (debug === true) console.log(extension);
         var inventory_item = {};
         inventory_item.name = extension.name;
         inventory_item.bundleid = extension.id;
@@ -655,8 +653,8 @@ function getSettings(){
             reader.addEventListener("load", function (event) {
                 // data now in reader.result
                 var settings = JSON.parse(reader.result);
-                console.log('Using local settings file');
-                console.log(settings.debug);
+                if (debug === true) console.log('Using local settings file');
+                if (debug === true) console.log(settings.debug);
                 data.key = settings.key;
                 key = settings.key;
                 serverURL = settings.serverurl;
@@ -669,7 +667,7 @@ function getSettings(){
             reader.readAsText(file);
         });
     }, function (e) {
-        //console.log(e);
+        console.log(e);
     });
   });
   chrome.storage.managed.get(null, function(adminConfig) {
@@ -679,6 +677,7 @@ function getSettings(){
     data.key = adminConfig['key'];
     key = adminConfig['key'];
     serverURL = adminConfig['serverurl'];
+    // TODO: Remove legacy checkin code here
     if ("legacycheckin" in adminConfig) {
       legacyCheckin = adminConfig['legacycheckin'];
     }
@@ -686,9 +685,6 @@ function getSettings(){
     settingsSet = true;
     callbackCount++;
   });
-  // console.log(data.key);
-
-
 }
 
 function notRunningMessage() {
