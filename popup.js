@@ -244,7 +244,8 @@ function addManagedInstalls(report, appInventory){
         report.ManagedInstalls[extension.name] = {
           'status': 'PRESENT',
           'data': {
-            'type': "Extension",
+            // 'type': "Extension",
+            'type': extension.install_type,
             'installed_version': extension.version,
             'description': extension.description,
             'display_name': extension.bundleid
