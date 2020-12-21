@@ -428,8 +428,8 @@ async function getGoogleDeviceIdentifier() {
   });
   try {
       chrome.enterprise.deviceAttributes.getDirectoryDeviceId(async google_deviceId => {
-        if (debug === true) renderStatus(deviceId);
-        if (debug === true) console.log(deviceId);
+        if (debug === true) renderStatus(google_deviceId);
+        if (debug === true) console.log(google_deviceId);
         data.google_device_identifier = google_deviceId.toUpperCase();
         if (data.google_device_identifier === '') {
           throw 'No Google Identifier returned'
