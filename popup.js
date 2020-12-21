@@ -4,7 +4,7 @@
 
 
 // Set up some globals
-var debug = true;
+var debug = false;
 var data = {};
 data.sal_version = '';
 var report = {};
