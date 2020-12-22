@@ -536,10 +536,6 @@ async function getHardwarePlatform() {
     catch(err) {
       report.MachineInfo.HardwareInfo.machine_model = 'Chrome OS Device';
       if (debug === true) console.log(err);
-      if (debug === false) {
-        console.log('setting do not send to true due to no Hardware info error and not being debug');
-        doNotSend = true;
-      }
     }
     callbackCount++;
 }
@@ -580,13 +576,7 @@ async function getNetworkInfo() {
       });
     }
     catch(err) {
-      if (debug === true){
-        console.log(err);
-      }
-      if (debug === false) {
-        console.log('setting do not send to true due to no network info error and not being debug');
-        doNotSend = true;
-      }
+      if (debug === true) console.log(err);
     }
     callbackCount++;
 }
