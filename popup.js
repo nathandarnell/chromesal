@@ -18,8 +18,9 @@ var settingsSet = false;
 
 var key = '';
 var serverURL = '';
+
 // TODO: Remove legacy checkin code here
-var legacyCheckin = false;
+// var legacyCheckin = false;
 
 function renderStatus(statusText) {
   try {
@@ -196,26 +197,26 @@ async function continueExec() {
   //Finally, do what you need
   setTimeout(sendData, 2000);
 }
+// TODO: Remove legacy checkin code here
+// function buildInventoryPlist(appInventory){
+//   var plistroot = []
+//   appInventory.forEach( function(extension){
 
-function buildInventoryPlist(appInventory){
-  var plistroot = []
-  appInventory.forEach( function(extension){
+//     dict = {}
+//     dict.bundleid = extension.bundleid;
+//     dict.version = extension.version;
+//     dict.CFBundleName = extension.name;
+//     dict.name = extension.name;
 
-    dict = {}
-    dict.bundleid = extension.bundleid;
-    dict.version = extension.version;
-    dict.CFBundleName = extension.name;
-    dict.name = extension.name;
+//     plistroot.push(dict)
+//   });
 
-    plistroot.push(dict)
-  });
-
-  plistroot = removeDuplicates(plistroot, 'bundleid')
+//   plistroot = removeDuplicates(plistroot, 'bundleid')
 
 
-  return PlistParser.toPlist(plistroot);
+//   return PlistParser.toPlist(plistroot);
 
-}
+// }
 
 function addManagedInstalls(report, appInventory){
 
@@ -223,21 +224,21 @@ function addManagedInstalls(report, appInventory){
     return report;
   }
   // TODO: Remove legacy checkin code here
-  if (legacyCheckin == true) {
-    var root = [];
-    appInventory.forEach( function(extension){
-      if (extension.install_type == 'admin') {
-        var dict = {}
-        dict.name = extension.name;
-        dict.display_name = extension.display_name;
-        dict.installed = true;
-        dict.installed_version = extension.version;
-        dict.installed_size = 0;
-        root.push(dict);
-      }
-    });
-    report.ManagedInstalls = root;
-  } else {
+  // if (legacyCheckin == true) {
+  //   var root = [];
+  //   appInventory.forEach( function(extension){
+  //     if (extension.install_type == 'admin') {
+  //       var dict = {}
+  //       dict.name = extension.name;
+  //       dict.display_name = extension.display_name;
+  //       dict.installed = true;
+  //       dict.installed_version = extension.version;
+  //       dict.installed_size = 0;
+  //       root.push(dict);
+  //     }
+  //   });
+  //   report.ManagedInstalls = root;
+  // } else {
     report.ManagedInstalls = {}
     appInventory.forEach ( function(extension){
       // if (extension.install_type == 'admin') {
@@ -256,7 +257,7 @@ function addManagedInstalls(report, appInventory){
 
     if (debug === true) console.log(report.ManagedInstalls);
 
-  }
+  // }
 
   return report;
 }
@@ -329,60 +330,61 @@ function sendData(){
   report = addManagedInstalls(report, appInventory);
 
   // TODO: Remove legacy checkin code here
-  if (legacyCheckin === true){
-    var reportPlist = PlistParser.toPlist(report);
-    data.base64report = btoa(reportPlist);
-    if (debug===true){
-      console.log(data);
-    }
-  } else{
+  // if (legacyCheckin === true){
+  //   var reportPlist = PlistParser.toPlist(report);
+  //   data.base64report = btoa(reportPlist);
+  //   if (debug===true){
+  //     console.log(data);
+  //   }
+  // } else{
     var reportJson = JSON.stringify(sal4ReportFormat(report))
     if (debug===true){
       console.log(reportJson);
     }
-  }
+  // }
 
   // TODO: Remove legacy checkin code here
-  var inventoryPlist = buildInventoryPlist(appInventory);
+  // var inventoryPlist = buildInventoryPlist(appInventory);
+
   // console.log(reportPlist);
   // console.log(inventoryPlist)
   // console.log(buildInventoryPlist(appInventory));
   // console.log(data)
   // console.log(buildInventoryPlist(appInventory));
   // console.log("legacyCheckin: "+legacyCheckin)
-  if (legacyCheckin === true){
-  jQuery.ajax({
-      type: "POST",
-      url: serverURL + '/checkin/',
-      data: data,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader ("Authorization", "Basic " + btoa("sal:" + data.key));
-      },
-      success: function(received) {
-          console.log(received);
-          data.base64inventory = btoa(unescape(encodeURIComponent(inventoryPlist)));
-          jQuery.ajax({
-              type: "POST",
-              url: serverURL + '/inventory/submit/',
-              data: data,
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader ("Authorization", "Basic " + btoa("sal:" + data.key));
-              },
-              success: function(received) {
-                console.log(received);
-              },
-              error: function(received) {
-                console.log(received.responseText);
-                console.log('Auth: ' + btoa("sal:" + data.key));
-                console.log(data);
-              },
-          });
-      },
-      error: function(received) {
-          console.log(received.responseText);
-      }
-  });
- } else {
+//   if (legacyCheckin === true){
+//   jQuery.ajax({
+//       type: "POST",
+//       url: serverURL + '/checkin/',
+//       data: data,
+//       beforeSend: function (xhr) {
+//         xhr.setRequestHeader ("Authorization", "Basic " + btoa("sal:" + data.key));
+//       },
+//       success: function(received) {
+//           console.log(received);
+//           data.base64inventory = btoa(unescape(encodeURIComponent(inventoryPlist)));
+//           jQuery.ajax({
+//               type: "POST",
+//               url: serverURL + '/inventory/submit/',
+//               data: data,
+//               beforeSend: function (xhr) {
+//                 xhr.setRequestHeader ("Authorization", "Basic " + btoa("sal:" + data.key));
+//               },
+//               success: function(received) {
+//                 console.log(received);
+//               },
+//               error: function(received) {
+//                 console.log(received.responseText);
+//                 console.log('Auth: ' + btoa("sal:" + data.key));
+//                 console.log(data);
+//               },
+//           });
+//       },
+//       error: function(received) {
+//           console.log(received.responseText);
+//       }
+//   });
+//  } else {
   jQuery.ajax({
     type: "POST",
     url: serverURL + '/checkin/',
@@ -416,7 +418,7 @@ function sendData(){
         console.log(received.responseText);
     }
 });
- }
+//  }
 
 }
 
@@ -683,9 +685,9 @@ function getSettings(){
     key = adminConfig['key'];
     serverURL = adminConfig['serverurl'];
     // TODO: Remove legacy checkin code here
-    if ("legacycheckin" in adminConfig) {
-      legacyCheckin = adminConfig['legacycheckin'];
-    }
+    // if ("legacycheckin" in adminConfig) {
+    //   legacyCheckin = adminConfig['legacycheckin'];
+    // }
 
     settingsSet = true;
     callbackCount++;
