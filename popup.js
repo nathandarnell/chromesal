@@ -450,10 +450,14 @@ function sendData(){
       console.log(received);
     })
     .catch(function (error) {
+      console.log(received.responseText);
+      console.log('Auth: ' + btoa("sal:" + key));
+      console.log(data);
       console.log('Request failed', error);
     });
   })
   .catch(function (error) {
+    console.log(received.responseText);
     console.log('Request failed', error);
   });
 
