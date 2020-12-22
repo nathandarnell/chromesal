@@ -12,7 +12,7 @@ report.MachineInfo = {};
 report.MachineInfo.HardwareInfo = {};
 var callbackCount = 0;
 var callbackTotal = 14;
-var doNotSend = true;
+var doNotSend = false;
 var appInventory = [];
 var settingsSet = false;
 
@@ -198,25 +198,25 @@ async function continueExec() {
   setTimeout(sendData, 2000);
 }
 // TODO: Remove legacy checkin code here
-// function buildInventoryPlist(appInventory){
-//   var plistroot = []
-//   appInventory.forEach( function(extension){
+function buildInventoryPlist(appInventory){
+  var plistroot = []
+  appInventory.forEach( function(extension){
 
-//     dict = {}
-//     dict.bundleid = extension.bundleid;
-//     dict.version = extension.version;
-//     dict.CFBundleName = extension.name;
-//     dict.name = extension.name;
+    dict = {}
+    dict.bundleid = extension.bundleid;
+    dict.version = extension.version;
+    dict.CFBundleName = extension.name;
+    dict.name = extension.name;
 
-//     plistroot.push(dict)
-//   });
+    plistroot.push(dict)
+  });
 
-//   plistroot = removeDuplicates(plistroot, 'bundleid')
+  plistroot = removeDuplicates(plistroot, 'bundleid')
 
 
-//   return PlistParser.toPlist(plistroot);
+  return PlistParser.toPlist(plistroot);
 
-// }
+}
 
 function addManagedInstalls(report, appInventory){
 
@@ -344,7 +344,7 @@ function sendData(){
   // }
 
   // TODO: Remove legacy checkin code here
-  // var inventoryPlist = buildInventoryPlist(appInventory);
+  var inventoryPlist = buildInventoryPlist(appInventory);
 
   // console.log(reportPlist);
   // console.log(inventoryPlist)
