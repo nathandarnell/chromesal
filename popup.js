@@ -12,7 +12,7 @@ report.MachineInfo = {};
 report.MachineInfo.HardwareInfo = {};
 var callbackCount = 0;
 var callbackTotal = 14;
-var doNotSend = true;
+var doNotSend = false;
 var appInventory = [];
 var settingsSet = false;
 
