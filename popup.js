@@ -385,7 +385,7 @@ function sendData(){
 //       }
 //   });
 //  } else {
-  jQuery.ajax({
+ /*  jQuery.ajax({
     type: "POST",
     url: serverURL + '/checkin/',
     data: reportJson,
@@ -418,7 +418,44 @@ function sendData(){
         console.log(received.responseText);
     }
 });
-//  }
+//  } */
+
+  const checkInURL = serverURL + '/checkin/';
+
+  fetch(checkInURL, {
+    method: 'post',
+    headers: {
+      "Authorization": "Basic " + btoa("sal:" + key),
+      "Content-Type": "application/json;charset=utf-8",
+      "Accept": "application/json;charset=utf-8",
+    },
+    body: reportJson
+  })
+  .then(function (received) {
+    console.log(received);
+
+    data.base64inventory = btoa(unescape(encodeURIComponent(inventoryPlist)));
+    const submitURL = serverURL + '/inventory/submit/';
+  
+    fetch(submitURL, {
+      method: 'post',
+      headers: {
+        "Authorization": "Basic " + btoa("sal:" + key),
+        "Content-Type": "application/json;charset=utf-8",
+        "Accept": "application/json;charset=utf-8",
+      },
+      body: data
+    })
+    .then(function (received) {
+      console.log(received);
+    })
+    .catch(function (error) {
+      console.log('Request failed', error);
+    });
+  })
+  .catch(function (error) {
+    console.log('Request failed', error);
+  });
 
 }
 
