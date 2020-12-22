@@ -433,7 +433,6 @@ async function getGoogleDeviceIdentifier() {
   });
   try {
       chrome.enterprise.deviceAttributes.getDirectoryDeviceId(async google_deviceId => {
-        if (debug === true) renderStatus(google_deviceId);
         if (debug === true) console.log(google_deviceId);
         data.google_device_identifier = google_deviceId.toUpperCase();
         if (data.google_device_identifier === '') {
@@ -472,7 +471,6 @@ async function getDeviceSerial() {
   });
   try {
       chrome.enterprise.deviceAttributes.getDeviceSerialNumber(async serialNumber => {
-        if (debug === true) renderStatus(serialNumber);
         if (debug === true) console.log(serialNumber);
           data.serial = serialNumber.toUpperCase();
           if (data.serial === '') {
@@ -513,7 +511,6 @@ async function getHardwarePlatform() {
       chrome.enterprise.hardwarePlatform.getHardwarePlatformInfo(async function(info) {
           if (!info || info === 'undefined') throw 'No Hardware info returned (empty)';
           // if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
-          if (debug === true) renderStatus(info);
           if (debug === true) console.log(info);
           var make = info.manufacturer;
           var model = info.model;
@@ -562,7 +559,6 @@ async function getNetworkInfo() {
     chrome.enterprise.networkingAttributes.getNetworkDetails(async function(info) {
           if (!info || info === 'undefined') throw 'No networking info returned (empty)';
           // if (!Array.isArray(info) || !info.length) throw 'No Hardware info returned (Not array or length 0)';
-//           renderStatus(info);
           if (debug === true) console.log(info);
           data.ipv4 = info.ipv4;
           data.ipv6 = info.ipv6;
